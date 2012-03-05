@@ -1,0 +1,9 @@
+# Remote reliable TCP syslogging with disk failover
+$WorkDirectory /var/spool/rsyslog  # default location for work (spool) files
+$ActionQueueType LinkedList   # use asynchronous processing
+$ActionQueueFileName srvrfwd  # set file name, also enables disk mode
+$ActionResumeRetryCount -1    # infinite retries on insert failure
+$ActionQueueSaveOnShutdown on # save in-memory data if rsyslog shuts down
+
+# RELP provides reliable remote syslog protocol
+*.*  :omrelp:<%= rsyslog_server_address %>:<%= rsyslog_server_port %>

@@ -1,47 +1,84 @@
 class rsyslog {
 
-	package { 'stunnel':
-		ensure => present,
-		before => [Package['rsyslog'],File['/etc/stunnel/stunnel.conf'],File['/etc/default/stunnel4']],
-	}
+  package { 'rsyslog':
+    ensure => installed,
+    require => Package['openvpn'],
+  }
+  
+  package { 'rsyslog-relp':
+    ensure => installed,
+    require => Package['rsyslog'],
+    notify  => Service['rsyslog'],
+  }
+}
 
-	file { '/etc/default/stunnel4':
-		ensure => file,
-		require => Package['stunnel'],
-		source => 'puppet:///rsyslog/stunnel-default',
-	}
+class rsyslog::client inherits rsyslog {
 
-	file { '/etc/stunnel/stunnel.conf':
-		ensure => file,
-		require => Package['stunnel'],
-		source => 'puppet:///rsyslog/stunnel.conf',
-	}
+  file { '/etc/rsyslog.conf':
+    owner   => root,
+    group   => root,
+    mode    => '0644',
+    require => Package["rsyslog-relp"],
+    content => template("rsyslog/rsyslog.client.erb"),
+  }
+  
+  file { 'client-central-conf':
+    path    => "/etc/rsyslog.d/60-central.conf",
+    owner   => root,
+    group   => root,
+    mode    => '0644',
+    require => Package["rsyslog-relp"],
+    content => template("rsyslog/60-central.client.erb"),
+    notify  => Service['rsyslog'],
+  }
+  
+  service { 'rsyslog':
+    ensure     => running,
+    enable     => true,
+    hasrestart => true,
+    hasstatus  => true,
+    require    => Package["rsyslog-relp"],
+  }
+}
 
-	service { 'stunnel4':
-		ensure => running,
-		enable => true,
-		hasrestart => true,
-		hasstatus => false,
-		status => "true",
-		subscribe => [File['/etc/stunnel/stunnel.conf'],File['/etc/default/stunnel4']],
-	}
+class rsyslog::server inherits rsyslog {
+  
+  file { '/etc/rsyslog.conf':
+    owner   => root,
+    group   => root,
+    mode    => '0644',
+    require => Package["rsyslog-relp"],
+    content => template("rsyslog/rsyslog.server.erb"),
+    notify  => Service['rsyslog'],
+  }
+  
+  file { '/etc/rsyslog.d/60-central.conf':
+      path    => "/etc/rsyslog.d/60-centtelnet ral.conf",
+      owner   => root,
+      group   => root,
+      mode    => '0644',
+      require => Package["rsyslog-relp"],
+      content => template("rsyslog/60-central.server.erb");
+    notify  => Service['rsyslog'],
+  }
+  
+  service { 'rsyslog':
+    ensure     => running,
+    enable     => true,
+    hasrestart => true,
+    hasstatus  => true,
+    status     => "true",
+    require    => Package["rsyslog-relp"],
+    subscribe  => [ File[server-conf],File[server-central-conf],Package["rsyslog-relp"]]
+  }
 
-	package { 'rsyslog':
-		ensure => present,
-		before => File['/etc/rsyslog.d/60-centrallogging.conf'],
-	}
-
-	file { '/etc/rsyslog.d/60-centrallogging.conf':
-		ensure => file,
-		require => Package['rsyslog'],
-		source => 'puppet:///rsyslog/centrallogging.conf',
-	}
-
-	service { 'rsyslog':
-		ensure => running,
-		enable => true,
-		hasrestart => true,
-		hasstatus => true,
-		subscribe => File['/etc/rsyslog.d/60-centrallogging.conf'],
-	}
+  file { 'logrotate-remote-syslog':
+    path    => "/etc/logrotate.d/remote-rsyslog",
+    owner   => root,
+    group   => root,
+    mode    => '0644',
+    require => Package[ logrotate ],
+    content => template("rsyslog/logrotate.conf")
+  }
+ 
 }
