@@ -4,6 +4,15 @@
 # Messages containing the keyword 'nova' go to nova.log.  This will generate
 # some false positives, but not enough to be too worried about
 
+#$AllowedSender UDP, 10.9.0.0/24
+#$AllowedSender TCP, 10.9.0.0/24
+
+#*.* @@127.0.0.1:61514
+#$template DailyPerHostLogs,"/var/log/remote-syslogs/%HOSTNAME%/messages.log"
+#$template DailyPerHostLogs,"/var/log/remote-syslogs/%HOSTNAME%/syslog.log"
+#$template DailyPerHostLogs,"/var/log/remote-syslogs/%HOSTNAME%/*.*"
+#*.* -?DailyPerHostLogs
+
 # Remote message processing
 $template DYNauth,"/var/log/remote-syslog/%HOSTNAME%/auth.log"
 $template DYNsyslog,"/var/log/remote-syslog/%HOSTNAME%/syslog.log"
