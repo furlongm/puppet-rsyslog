@@ -35,15 +35,14 @@ class rsyslog::client inherits rsyslog {
   service { 'rsyslog':
     ensure     => running,
     enable     => true,
-    hasrestart => true,
-    hasstatus  => true,
     require    => Package["rsyslog-relp"],
   }
 }
 
 class rsyslog::server inherits rsyslog {
   
-  file { '/etc/rsyslog.conf':
+  file { 'rsyslog-server-conf':
+    path    => '/etc/rsyslog.conf',
     owner   => root,
     group   => root,
     mode    => '0644',
@@ -52,24 +51,23 @@ class rsyslog::server inherits rsyslog {
     notify  => Service['rsyslog'],
   }
   
-  file { '/etc/rsyslog.d/60-central.conf':
-      path    => "/etc/rsyslog.d/60-centtelnet ral.conf",
-      owner   => root,
-      group   => root,
-      mode    => '0644',
-      require => Package["rsyslog-relp"],
-      content => template("rsyslog/60-central.server.erb");
+  file { 'rsyslog-central-conf':
+    path    => "/etc/rsyslog.d/60-central.conf",
+    owner   => root,
+    group   => root,
+    mode    => '0644',
+    require => Package["rsyslog-relp"],
+    content => template("rsyslog/60-central.server.erb"),
     notify  => Service['rsyslog'],
   }
   
   service { 'rsyslog':
     ensure     => running,
     enable     => true,
-    hasrestart => true,
-    hasstatus  => true,
-    status     => "true",
     require    => Package["rsyslog-relp"],
-    subscribe  => [ File[server-conf],File[server-central-conf],Package["rsyslog-relp"]]
+    subscribe  => [ File['rsyslog-server-conf'],
+                    File['rsyslog-central-conf'],
+                    Package["rsyslog-relp"]],
   }
 
   file { 'logrotate-remote-syslog':
@@ -77,8 +75,8 @@ class rsyslog::server inherits rsyslog {
     owner   => root,
     group   => root,
     mode    => '0644',
-    require => Package[ logrotate ],
-    content => template("rsyslog/logrotate.conf")
+    require => Package[logrotate],
+    content => template("rsyslog/logrotate.conf"),
   }
  
 }
