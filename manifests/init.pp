@@ -37,6 +37,14 @@ class rsyslog::client inherits rsyslog {
     enable     => true,
     require    => Package["rsyslog-relp"],
   }
+
+  file { '/var/spool/rsyslog':
+    ensure => directory,
+    owner  => syslog,
+    group  => adm,
+    mode   => '0755',
+  }
+
 }
 
 class rsyslog::server inherits rsyslog {
