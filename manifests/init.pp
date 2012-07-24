@@ -4,7 +4,7 @@ class rsyslog {
     ensure => installed,
     require => Package['openvpn'],
   }
-  
+
   package { 'rsyslog-relp':
     ensure => installed,
     require => Package['rsyslog'],
@@ -21,7 +21,17 @@ class rsyslog::client inherits rsyslog {
     require => Package["rsyslog-relp"],
     content => template("rsyslog/rsyslog.client.erb"),
   }
-  
+
+  file { 'client-default-conf':
+    path    => "/etc/rsyslog.d/50-default.conf",
+    owner   => root,
+    group   => root,
+    mode    => '0644',
+    require => Package["rsyslog-relp"],
+    source  => 'puppet:///modules/rsyslog/50-default.conf',
+    notify  => Service['rsyslog'],
+  }
+
   file { 'client-central-conf':
     path    => "/etc/rsyslog.d/60-central.conf",
     owner   => root,
@@ -31,7 +41,7 @@ class rsyslog::client inherits rsyslog {
     content => template("rsyslog/60-central.client.erb"),
     notify  => Service['rsyslog'],
   }
-  
+
   service { 'rsyslog':
     ensure     => running,
     enable     => true,
@@ -48,7 +58,7 @@ class rsyslog::client inherits rsyslog {
 }
 
 class rsyslog::server inherits rsyslog {
-  
+
   file { 'rsyslog-server-conf':
     path    => '/etc/rsyslog.conf',
     owner   => root,
@@ -58,7 +68,7 @@ class rsyslog::server inherits rsyslog {
     content => template("rsyslog/rsyslog.server.erb"),
     notify  => Service['rsyslog'],
   }
-  
+
   file { 'rsyslog-central-conf':
     path    => "/etc/rsyslog.d/60-central.conf",
     owner   => root,
@@ -68,7 +78,7 @@ class rsyslog::server inherits rsyslog {
     content => template("rsyslog/60-central.server.erb"),
     notify  => Service['rsyslog'],
   }
-  
+
   service { 'rsyslog':
     ensure     => running,
     enable     => true,
@@ -86,5 +96,5 @@ class rsyslog::server inherits rsyslog {
     require => Package[logrotate],
     content => template("rsyslog/logrotate.conf"),
   }
- 
+
 }

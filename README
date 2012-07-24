@@ -1,0 +1,10 @@
+This package depends on the openvpn class.
+
+e.g.
+
+node 'host.rc.nectar.org.au' inherits base {
+  $openvpn_hosts = [ 'admin.rc.nectar.org.au 1194' ]
+  include openvpn::client
+  include rsyslog::client
+}
+
