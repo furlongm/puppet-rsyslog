@@ -36,7 +36,7 @@ $template NOVAcompute,"/var/log/remote-syslog/%HOSTNAME%/nova.log"
 #$RuleSet remote
 # splitting up nova stuff
 
-if $msg contains 'nova' then ?NOVAcompute 
+if $programname contains 'nova' then ?NOVAcompute 
 & ~
 
 #
