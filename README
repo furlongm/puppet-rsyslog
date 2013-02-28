@@ -1,10 +1,30 @@
-This package depends on the openvpn class.
+Example usage for client:
 
-e.g.
+  node 'host.rc.nectar.org.au' inherits base {
+    $openvpn_hosts = [ 'admin.rc.nectar.org.au 1194' ]
+    include openvpn::client
+    include rsyslog::client
+  }
 
-node 'host.rc.nectar.org.au' inherits base {
-  $openvpn_hosts = [ 'admin.rc.nectar.org.au 1194' ]
-  include openvpn::client
-  include rsyslog::client
-}
+There are a number of configurations available:
 
+include rsyslog (for default local rsyslog setup)
+
+
+include rsyslog::client (for remote logging on client)
+ - depends on openvpn class
+
+
+include rsyslog::server (for remote logging on server)
+ - depends on openvpn class
+
+
+include rsyslog::server::ui (for ui on server)
+
+ - depends on the following modules and classes
+
+ ├── garethr-kibana (v0.0.1)
+ ├── ispavailability-elasticsearch (v0.0.2)
+ ├── ispavailability-logstash (v0.0.4)
+
+ nginx class
