@@ -144,9 +144,18 @@ class rsyslog::server::ui inherits rsyslog::server {
       'cluster'              => {
         'name'               => 'logstash'
       },
-      'index'                => {
-        'number_of_replicas' => '0',
-        'number_of_shards'   => '5'
+      'index'                        => {
+        'number_of_replicas'         => '0',
+        'number_of_shards'           => '5',
+        'analysis'                   => {
+           'tokenizer'               => {
+             'token_filter'          => {
+               'word_delimiter'      => {
+                 'preserve_original' => true,
+              },
+            },
+          },
+        },
       },
       'network'              => {
         'host'               => '0.0.0.0'
