@@ -135,9 +135,7 @@ class rsyslog::server::ui inherits rsyslog::server {
     notify  => Service['rsyslog'],
   }
 
-  class { 'logstash':
-    defaultsfile => 'puppet:///modules/logstash/etc-default-logstash',
-  }
+  include logstash
 
   class { 'elasticsearch':
     config                   => {
@@ -147,16 +145,7 @@ class rsyslog::server::ui inherits rsyslog::server {
       'index'                        => {
         'number_of_replicas'         => '0',
         'number_of_shards'           => '5',
-        'analysis'                   => {
-           'tokenizer'               => {
-             'token_filter'          => {
-               'word_delimiter'      => {
-                 'preserve_original' => true,
-              },
-            },
-          },
         },
-      },
       'network'              => {
         'host'               => '0.0.0.0'
       },
