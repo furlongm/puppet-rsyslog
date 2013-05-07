@@ -56,29 +56,33 @@ class rsyslog($port) {
 
 class rsyslog::client($server) inherits rsyslog {
 
-  class { openvpn : }
+  # set this to allow the syslog server to be excluded (confusingly)
+  if $server != 'False' {
 
-  file { '/etc/rsyslog.d/03-relp-output-modules.conf':
-    source  => 'puppet:///modules/rsyslog/03-relp-output-modules.conf',
-    owner   => root,
-    group   => root,
-    mode    => 0644,
-    notify  => Service['rsyslog'],
-  }
+    class { openvpn : }
 
-  file { '/etc/rsyslog.d/60-remote-server.conf':
-    content => template("rsyslog/60-remote-server.conf.erb"),
-    owner   => root,
-    group   => root,
-    mode    => 0644,
-    notify  => Service['rsyslog'],
-  }
+    file { '/etc/rsyslog.d/03-relp-output-modules.conf':
+      source  => 'puppet:///modules/rsyslog/03-relp-output-modules.conf',
+      owner   => root,
+      group   => root,
+      mode    => 0644,
+      notify  => Service['rsyslog'],
+    }
 
-  file { '/var/spool/rsyslog':
-    ensure => directory,
-    owner  => syslog,
-    group  => adm,
-    mode   => '0775',
+    file { '/etc/rsyslog.d/60-remote-server.conf':
+      content => template("rsyslog/60-remote-server.conf.erb"),
+      owner   => root,
+      group   => root,
+      mode    => 0644,
+      notify  => Service['rsyslog'],
+    }
+
+    file { '/var/spool/rsyslog':
+      ensure => directory,
+      owner  => syslog,
+      group  => adm,
+      mode   => '0775',
+    }
   }
 }
 

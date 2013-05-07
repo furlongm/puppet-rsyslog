@@ -39,7 +39,7 @@ rsyslog::server::ui
 Sets up web interface to view logs
 
 Depends on the following modules and classes
- * garethr-kibana (v0.0.1)
- * ispavailability-elasticsearch (v0.0.2)
- * ispavailability-logstash (v0.0.4)
+ * kibana (modified from garethr/kibana 0.0.1)
+ * ispavailability-elasticsearch (v0.0.7)
+ * ispavailability-logstash (v0.2.0)
  * nginx
