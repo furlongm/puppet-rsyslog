@@ -56,10 +56,11 @@ class rsyslog($port) {
 
 class rsyslog::client($server) inherits rsyslog {
 
-  # set this to allow the syslog server to be excluded (confusingly)
-  if $server != 'False' {
+  if (is_ip_address($server) and has_interface_with("ipaddress", $server)) or $::fqdn == $server {
+    $is_server = true
+  }
 
-    class { openvpn : }
+  if $is_server != true {
 
     file { '/etc/rsyslog.d/03-relp-output-modules.conf':
       source  => 'puppet:///modules/rsyslog/03-relp-output-modules.conf',
@@ -87,6 +88,8 @@ class rsyslog::client($server) inherits rsyslog {
 }
 
 class rsyslog::server inherits rsyslog {
+
+  $admin_hosts = hiera('iptables_templates::admin_hosts', [])
 
   file { '/etc/rsyslog.d/02-relp-input-modules.conf':
     source  => 'puppet:///modules/rsyslog/02-relp-input-modules.conf',
