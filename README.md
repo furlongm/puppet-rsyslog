@@ -42,4 +42,8 @@ Depends on the following modules and classes
  * kibana (modified from garethr/kibana 0.0.1)
  * ispavailability-elasticsearch (v0.0.7)
  * ispavailability-logstash (v0.2.0)
- * nginx
+
+
+Web Server configs
+=======
+Sample web server configs for apache and nginx are contained in the files/ directory.

@@ -177,21 +177,4 @@ class rsyslog::server::ui inherits rsyslog::server {
   }
 
   class { 'kibana': }
-  class { 'nginx': }
-
-  file { '/etc/nginx/sites-available/syslog-server.conf':
-    content => template('rsyslog/rsyslog-nginx.conf.erb'),
-    owner   => root,
-    group   => root,
-    mode    => 0644,
-    notify  => Service['nginx'],
-  }
-
-  file { '/etc/nginx/sites-enabled/syslog-server.conf':
-    ensure  => link,
-    target  => '/etc/nginx/sites-available/syslog-server.conf',
-    owner   => root,
-    group   => root,
-    notify  => Service['nginx'],
-  }
 }
