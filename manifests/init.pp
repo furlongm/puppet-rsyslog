@@ -130,6 +130,20 @@ class rsyslog::server inherits rsyslog {
     mode    => 0770,
     notify  => Service['rsyslog'],
   }
+
+  $infra_hosts = hiera('firewall::infra_hosts', [])
+
+  firewall::multisource {[ prefix($infra_hosts, '100 rsyslog tcp,') ]:
+    action => 'accept',
+    proto  => 'tcp',
+    dport  => [$rsyslog::port, 514],
+  }
+
+  firewall::multisource {[ prefix($infra_hosts, '100 rsyslog udp,') ]:
+    action => 'accept',
+    proto  => 'udp',
+    dport  => [514],
+  }
 }
 
 class rsyslog::server::ui inherits rsyslog::server {
