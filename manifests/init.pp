@@ -152,9 +152,21 @@ class rsyslog::server::ui inherits rsyslog::server {
       'index'                        => {
         'number_of_replicas'         => '0',
         'number_of_shards'           => '5',
-        },
+      },
       'network'              => {
-        'host'               => '0.0.0.0'
+        'host'               => '127.0.0.1'
+      },
+      'discovery'            => {
+        'ping'               => {
+          'zen'              => {
+            'multicast'      => {
+              'enabled'      => 'false'
+            },
+            'unicast'        => {
+              'hosts'        => '127.0.0.1:9301'
+            },
+          },
+        },
       },
      'path'                  => {
         'conf'               => '/etc/elasticsearch',
