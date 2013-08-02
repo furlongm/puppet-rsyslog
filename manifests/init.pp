@@ -2,7 +2,7 @@ class rsyslog($port) {
 
   Package { ensure => present }
 
-  $rsyslog_packages = ['rsyslog', 'rsyslog-relp', 'logrotate']
+  $rsyslog_packages = ['rsyslog', 'rsyslog-relp']
 
   package { $rsyslog_packages: }
 
