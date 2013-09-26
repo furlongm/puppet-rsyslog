@@ -98,7 +98,26 @@ class rsyslog::client($server) inherits rsyslog {
   }
 }
 
-class rsyslog::server inherits rsyslog {
+class rsyslog::server ($raw_log=undef) inherits rsyslog {
+
+  if $raw_log != undef {
+
+    file { '/etc/rsyslog.d/35-raw.conf':
+      source  => 'puppet:///modules/rsyslog/35-raw.conf',
+      owner   => root,
+      group   => root,
+      mode    => 0644,
+      notify  => Service['rsyslog'],
+    }
+
+  } else {
+
+    file { '/etc/rsyslog.d/35-raw.conf':
+      ensure => absent,
+      notify => Service['rsyslog'],
+    }
+
+  }
 
   $admin_hosts = hiera('iptables_templates::admin_hosts', [])
 
