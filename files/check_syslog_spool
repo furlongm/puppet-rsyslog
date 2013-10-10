@@ -1,0 +1,22 @@
+#!/bin/bash
+
+spool_dir=/var/spool/rsyslog
+warning=5
+critical=10
+
+if [ ! -d "$spool_dir" ] ; then
+    echo "No syslog spool directory exists"
+    exit 3
+else
+    let file_count=`ls $spool_dir | wc -l`
+    if [ $file_count -le $warning ] ; then
+        echo "OK: Less than $warning files in $spool_dir"
+        exit 0
+    elif [ $file_count -gt $warning ] && [ $file_count -le $critical ] ; then
+        echo "WARNING: $file_count files in $spool_dir"
+        exit 1
+    elif [ $file_count -gt $critical ] ; then
+        echo "CRITICAL: $file_count files in $spool_dir"
+        exit 2
+    fi
+fi

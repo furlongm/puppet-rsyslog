@@ -52,6 +52,17 @@ class rsyslog($port) {
     mode    => 0644,
     notify  => Service['rsyslog'],
   }
+
+  file { '/usr/local/lib/nagios/plugins/check_syslog_spool':
+    owner  => root,
+    group  => root,
+    mode   => '0755',
+    source => 'puppet:///modules/rsyslog/check_syslog_spool',
+  }
+
+  nagios::nrpe::service { 'check_syslog_spool':
+     check_command => '/usr/local/lib/nagios/plugins/check_syslog_spool';
+  }
 }
 
 class rsyslog::client($server) inherits rsyslog {
