@@ -12,13 +12,13 @@ class rsyslog($port) {
     require => Package[$rsyslog_packages],
   }
 
-  # (temporary)
-  file { ['/etc/rsyslog.d/50-default.conf','/etc/rsyslog.d/60-central.conf']:
-    ensure  => absent,
-    owner   => root,
-    group   => root,
-    mode    => 0644,
+  file {'/etc/rsyslog.d':
+    ensure  => directory,
+    recurse => true,
+    purge   => true,
+    force   => true,
     notify  => Service['rsyslog'],
+    require => Package['rsyslog'],
   }
 
   file { '/etc/rsyslog.conf':
