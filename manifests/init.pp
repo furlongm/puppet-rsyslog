@@ -48,7 +48,7 @@ class rsyslog($port) {
   }
 
   file { '/etc/rsyslog.d/50-default-rules.conf':
-    source  => 'puppet:///modules/rsyslog/50-default-rules.conf',
+    content => template('rsyslog/50-default-rules.conf.erb'),
     owner   => root,
     group   => root,
     mode    => 0644,

@@ -1,0 +1,71 @@
+# Local message processing templates
+$template LOCALauth,     "/var/log/auth.log"
+$template LOCALsyslog,   "/var/log/syslog"
+$template LOCALcron,     "/var/log/cron.log"
+$template LOCALdaemon,   "/var/log/daemon.log"
+$template LOCALkern,     "/var/log/kern.log"
+$template LOCALlpr,      "/var/log/lpr.log"
+$template LOCALmail,     "/var/log/mail.log"
+$template LOCALuser,     "/var/log/user.log"
+$template LOCALmaili,    "/var/log/mail.info"
+$template LOCALmailw,    "/var/log/mail.warn"
+$template LOCALmaile,    "/var/log/mail.err"
+$template LOCALnewsc,    "/var/log/news/news.crit"
+$template LOCALnewse,    "/var/log/news/news.err"
+$template LOCALnewsn,    "/var/log/news/news.notice"
+$template LOCALdebug,    "/var/log/debug"
+$template LOCALmessages, "/var/log/messages"
+
+<% if $rsyslog_majversion != '5' -%>
+#
+# Only log if the message comes from localhost (requires v7)
+#
+if $fromhost-ip == '127.0.0.1' then {
+<% end -%>
+
+#
+# First some standard log files.  Log by facility.
+#
+    auth,authpriv.*                 ?LOCALauth
+    *.*;kern,auth,authpriv.none     ?LOCALsyslog
+    cron.*                          ?LOCALcron
+    daemon.*                        ?LOCALdaemon
+    kern.*                          ?LOCALkern
+    lpr.*                           ?LOCALlpr
+    mail.*                          ?LOCALmail
+    user.*                          ?LOCALuser
+
+#
+# Logging for the mail system.  Split it up so that
+# it is easy to write scripts to parse these files.
+#
+    mail.info                       ?LOCALmaili
+    mail.warn                       ?LOCALmailw
+    mail.err                        ?LOCALmaile
+
+#
+# Logging for INN news system.
+#
+    news.crit                       ?LOCALnewsc
+    news.err                        ?LOCALnewse
+    news.notice                     ?LOCALnewsn
+
+#
+# Some "catch-all" log files.
+#
+    *.=debug;\
+        auth,authpriv.none;\
+        news.none;mail.none         ?LOCALdebug
+    *.=info;*.=notice;*.=warn;\
+        auth,authpriv.none;\
+        cron,daemon.none;\
+        kern.none;\
+        mail,news.none              ?LOCALmessages
+<% if $rsyslog_majversion != '5' -%>
+}
+<% end -%>
+
+#
+# Emergencies are sent to everybody logged in.
+#
+*.emerg                         :omusrmsg:*
