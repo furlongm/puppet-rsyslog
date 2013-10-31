@@ -12,7 +12,7 @@ class rsyslog($port) {
     require => Package[$rsyslog_packages],
   }
 
-  file {'/etc/rsyslog.d':
+  file { '/etc/rsyslog.d':
     ensure  => directory,
     recurse => true,
     purge   => true,
@@ -35,6 +35,7 @@ class rsyslog($port) {
     group   => root,
     mode    => 0644,
     notify  => Service['rsyslog'],
+    require => File['/etc/rsyslog.d'],
   }
 
   file { '/etc/rsyslog.d/10-global-directives.conf':
@@ -43,6 +44,7 @@ class rsyslog($port) {
     group   => root,
     mode    => 0644,
     notify  => Service['rsyslog'],
+    require => File['/etc/rsyslog.d'],
   }
 
   file { '/etc/rsyslog.d/50-default-rules.conf':
@@ -51,6 +53,7 @@ class rsyslog($port) {
     group   => root,
     mode    => 0644,
     notify  => Service['rsyslog'],
+    require => File['/etc/rsyslog.d'],
   }
 
   file { '/usr/local/lib/nagios/plugins/check_syslog_spool':
@@ -79,6 +82,7 @@ class rsyslog::client($server) inherits rsyslog {
       group   => root,
       mode    => 0644,
       notify  => Service['rsyslog'],
+      require => File['/etc/rsyslog.d'],
     }
 
     file { '/etc/rsyslog.d/60-remote-server.conf':
@@ -87,6 +91,7 @@ class rsyslog::client($server) inherits rsyslog {
       group   => root,
       mode    => 0644,
       notify  => Service['rsyslog'],
+      require => File['/etc/rsyslog.d'],
     }
 
     file { '/var/spool/rsyslog':
@@ -108,6 +113,7 @@ class rsyslog::server ($raw_log=undef) inherits rsyslog {
       group   => root,
       mode    => 0644,
       notify  => Service['rsyslog'],
+      require => File['/etc/rsyslog.d'],
     }
 
   } else {
@@ -127,6 +133,7 @@ class rsyslog::server ($raw_log=undef) inherits rsyslog {
     group   => root,
     mode    => 0644,
     notify  => Service['rsyslog'],
+    require => File['/etc/rsyslog.d'],
   }
 
   file { '/etc/rsyslog.d/51-server-rules.conf':
@@ -135,6 +142,7 @@ class rsyslog::server ($raw_log=undef) inherits rsyslog {
     group   => root,
     mode    => 0644,
     notify  => Service['rsyslog'],
+    require => File['/etc/rsyslog.d'],
   }
 
   file { '/etc/rsyslog.d/75-relp-server.conf':
@@ -143,6 +151,7 @@ class rsyslog::server ($raw_log=undef) inherits rsyslog {
     group   => root,
     mode    => 0644,
     notify  => Service['rsyslog'],
+    require => File['/etc/rsyslog.d'],
   }
 
   file { '/etc/logrotate.d/remote-rsyslogs':
@@ -184,6 +193,7 @@ class rsyslog::server::ui inherits rsyslog::server {
     group   => root,
     mode    => 0644,
     notify  => Service['rsyslog'],
+    require => File['/etc/rsyslog.d'],
   }
 
   include logstash
