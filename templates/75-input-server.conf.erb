@@ -1,0 +1,14 @@
+# TODO: allowed hosts.
+#$AllowedSender TCP, 10.9.0.0/24
+
+<% if enable_relp -%>
+$InputRELPServerRun 20514
+<% end -%>
+
+<% if enable_tcp -%>
+$InputTCPServerRun 514
+<% end -%>
+
+<% if enable_udp -%>
+$UDPServerRun 514
+<% end -%>

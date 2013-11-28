@@ -9,9 +9,6 @@ rsyslog
 -------
 For default local rsyslog setup
 
-Variables:
- * rsyslog::port - Port when using remote logging
-
 rsyslog::client
 ---------------
 For remote logging on client

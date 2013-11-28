@@ -1,4 +1,4 @@
-class rsyslog($port) {
+class rsyslog {
 
   Package { ensure => present }
 
@@ -68,22 +68,13 @@ class rsyslog($port) {
   }
 }
 
-class rsyslog::client($server) inherits rsyslog {
+class rsyslog::client($server, $transport='relp') inherits rsyslog {
 
   if (is_ip_address($server) and has_interface_with("ipaddress", $server)) or $::fqdn == $server {
     $is_server = true
   }
 
   if $is_server != true {
-
-    file { '/etc/rsyslog.d/03-relp-output-modules.conf':
-      source  => 'puppet:///modules/rsyslog/03-relp-output-modules.conf',
-      owner   => root,
-      group   => root,
-      mode    => 0644,
-      notify  => Service['rsyslog'],
-      require => File['/etc/rsyslog.d'],
-    }
 
     file { '/etc/rsyslog.d/60-remote-server.conf':
       content => template("rsyslog/60-remote-server.conf.erb"),
@@ -103,7 +94,9 @@ class rsyslog::client($server) inherits rsyslog {
   }
 }
 
-class rsyslog::server ($raw_log=undef) inherits rsyslog {
+class rsyslog::server ($raw_log=undef, $enable_tcp=undef, $enable_udp=undef, $enable_relp=undef) {
+
+  include rsyslog
 
   if $raw_log != undef {
 
@@ -125,10 +118,19 @@ class rsyslog::server ($raw_log=undef) inherits rsyslog {
 
   }
 
-  $admin_hosts = hiera('iptables_templates::admin_hosts', [])
+  file { '/etc/rsyslog.d/25-raw-format.conf':
+    source  => 'puppet:///modules/rsyslog/25-raw-format.conf',
+    owner   => root,
+    group   => root,
+    mode    => 0644,
+    notify  => Service['rsyslog'],
+    require => File['/etc/rsyslog.d'],
+  }
 
-  file { '/etc/rsyslog.d/02-relp-input-modules.conf':
-    source  => 'puppet:///modules/rsyslog/02-relp-input-modules.conf',
+  $admin_hosts = hiera('firewall::admin_hosts', [])
+
+  file { '/etc/rsyslog.d/02-input-modules.conf':
+    content => template("rsyslog/02-input-modules.conf.erb"),
     owner   => root,
     group   => root,
     mode    => 0644,
@@ -145,8 +147,8 @@ class rsyslog::server ($raw_log=undef) inherits rsyslog {
     require => File['/etc/rsyslog.d'],
   }
 
-  file { '/etc/rsyslog.d/75-relp-server.conf':
-    content => template('rsyslog/75-relp-server.conf.erb'),
+  file { '/etc/rsyslog.d/75-input-server.conf':
+    content => template('rsyslog/75-input-server.conf.erb'),
     owner   => root,
     group   => root,
     mode    => 0644,
@@ -172,17 +174,33 @@ class rsyslog::server ($raw_log=undef) inherits rsyslog {
 
   $infra_hosts = hiera('firewall::infra_hosts', [])
 
-  firewall::multisource {[ prefix($infra_hosts, '100 rsyslog tcp,') ]:
-    action => 'accept',
-    proto  => 'tcp',
-    dport  => [$rsyslog::port, 514],
+  if $enable_tcp != undef {
+
+    firewall::multisource {[ prefix($infra_hosts, '101 rsyslog-tcp,') ]:
+      action => 'accept',
+      proto  => 'tcp',
+      dport  => 514,
+    }
   }
 
-  firewall::multisource {[ prefix($infra_hosts, '100 rsyslog udp,') ]:
-    action => 'accept',
-    proto  => 'udp',
-    dport  => [514],
+  if $enable_udp != undef {
+
+    firewall::multisource {[ prefix($infra_hosts, '101 rsyslog-udp,') ]:
+      action => 'accept',
+      proto  => 'udp',
+      dport  => 514,
+    }
   }
+
+  if $enable_relp != undef {
+
+    firewall::multisource {[ prefix($infra_hosts, '101 rsyslog-relp,') ]:
+      action => 'accept',
+      proto  => 'tcp',
+      dport  => 20514,
+    }
+  }
+
 }
 
 class rsyslog::server::ui inherits rsyslog::server {

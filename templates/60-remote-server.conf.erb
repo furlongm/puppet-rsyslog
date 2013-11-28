@@ -1,3 +1,5 @@
+# File is managed by Puppet
+
 # Remote reliable TCP syslogging with disk failover
 $WorkDirectory /var/spool/rsyslog  # default location for work (spool) files
 $ActionQueueType LinkedList        # use asynchronous processing
@@ -5,6 +7,14 @@ $ActionQueueFileName srvrfwd       # set file name, also enables disk mode
 $ActionResumeRetryCount -1         # infinite retries on insert failure
 $ActionQueueSaveOnShutdown on      # save in-memory data if rsyslog shuts down
 
-
-# RELP provides reliable remote syslog protocol
-*.*  :omrelp:<%= server %>:<%= port %>
+# Log to remote syslog server using <%= transport %>
+<% if transport == 'tcp' -%>
+*.* @@<%= server -%>:514
+<% elsif transport == 'relp' -%>
+$ModLoad omrelp
+*.* :omrelp:<%= server %>:20514
+<% elsif transport == 'udp' -%>
+*.* @<%= server -%>:514
+<% else -%>
+<%= scope.function_warning(["# Make sure to specify transport type in Puppet. Options are 'relp', 'tcp' or 'udp'."]) %>
+<% end -%>
