@@ -1,8 +1,8 @@
 #!/bin/bash
 
 spool_dir=/var/spool/rsyslog
-warning=5
-critical=10
+warning=10
+critical=50
 
 if [ ! -d "$spool_dir" ] ; then
     echo "No syslog spool directory exists"
