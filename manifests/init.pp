@@ -94,7 +94,7 @@ class rsyslog::client($server, $transport='relp') inherits rsyslog {
   }
 }
 
-class rsyslog::server ($raw_log=undef, $enable_tcp=undef, $enable_udp=undef, $enable_relp=undef) {
+class rsyslog::server ($raw_log=undef, $enable_tcp=undef, $enable_udp=undef, $enable_relp='true') {
 
   include rsyslog
 
