@@ -181,6 +181,9 @@ class rsyslog::server ($raw_log=undef, $enable_tcp=undef, $enable_udp=undef, $en
       proto  => 'tcp',
       dport  => 514,
     }
+    nagios::service { 'rsyslog_tcp':
+      check_command => "check_tcp!514";
+    }
   }
 
   if $enable_udp != undef {
@@ -189,6 +192,16 @@ class rsyslog::server ($raw_log=undef, $enable_tcp=undef, $enable_udp=undef, $en
       action => 'accept',
       proto  => 'udp',
       dport  => 514,
+    }
+    file { '/usr/local/lib/nagios/plugins/check_udp_port':
+      owner  => root,
+      group  => root,
+      mode   => '0755',
+      source => 'puppet:///modules/rsyslog/check_udp_port',
+    }
+
+    nagios::nrpe::service { 'rsyslog_udp':
+       check_command => '/usr/local/lib/nagios/plugins/check_udp_port 514';
     }
   }
 
@@ -199,8 +212,10 @@ class rsyslog::server ($raw_log=undef, $enable_tcp=undef, $enable_udp=undef, $en
       proto  => 'tcp',
       dport  => 20514,
     }
+    nagios::service { 'rsyslog_relp':
+      check_command => "check_tcp!20514";
+    }
   }
-
 }
 
 class rsyslog::server::ui inherits rsyslog::server {
