@@ -56,6 +56,17 @@ class rsyslog {
     require => File['/etc/rsyslog.d'],
   }
 
+  if defined(Package['postfix']) {
+    file { '/etc/rsyslog.d/postfix.conf':
+      ensure  => present,
+      owner   => root,
+      group   => root,
+      mode    => '0644',
+      source  => 'puppet:///modules/rsyslog/rsyslog.conf',
+      notify  => Service['rsyslog'],
+    }
+  }
+
   file { '/usr/local/lib/nagios/plugins/check_syslog_spool':
     owner  => root,
     group  => root,
