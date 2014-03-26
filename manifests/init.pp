@@ -62,7 +62,7 @@ class rsyslog {
       owner   => root,
       group   => root,
       mode    => '0644',
-      source  => 'puppet:///modules/rsyslog/rsyslog.conf',
+      source  => 'puppet:///modules/rsyslog/postfix.conf',
       notify  => Service['rsyslog'],
     }
   }
