@@ -1,11 +1,9 @@
-<% if enable_tcp -%>
+<%- if @enable_tcp -%>
 $ModLoad imtcp
-<% end -%>
-
-<% if enable_udp -%>
+<%- end -%>
+<%- if @enable_udp -%>
 $ModLoad imudp
-<% end -%>
-
-<% if enable_relp -%>
+<%- end -%>
+<%- if @enable_relp -%>
 $ModLoad imrelp
-<% end -%>
+<%- end -%>
