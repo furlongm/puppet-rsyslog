@@ -67,5 +67,8 @@ if $fromhost-ip == '127.0.0.1' then {
 
 #
 # Emergencies are sent to everybody logged in.
+# Remove invalid facility CGRE messages first.
+# Otherwise these end up on the console as well.
 #
+:msg, contains, "CGRE[" ~
 *.emerg                         :omusrmsg:*
