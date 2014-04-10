@@ -1,11 +1,12 @@
 class rsyslog::repos {
 
-  apt::source { 'rsyslog':
-    location     => 'http://ppa.launchpad.net/adiscon/v7-stable/ubuntu/',
-    release      => "$::lsbdistcodename",
-    repos        => 'main',
-    pin          => '2200',
-    key          => '5234BF2B',
-    include_src  => false,
- }
+  apt::ppa { 'ppa:adiscon/v7-stable':
+    release => "${::lsbdistcodename}",
+  }
+
+  apt::pin { 'rsyslog':
+    packages => 'rsyslog rsyslog-relp libestr0 librelp0 libgt0 liblogging-stdlog1',
+    origin   => 'ppa.launchpad.net',
+    priority => 2200,
+  }
 }
