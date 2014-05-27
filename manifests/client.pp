@@ -32,9 +32,10 @@ class rsyslog::client($server,
   }
   logrotate::rule { 'rsyslog':
     ensure     => present,
-    path       => [ '/var/log/mail.*', '/var/log/daemon.log', '/var/log/kern.log', '/var/log/auth.log',
-                  '/var/log/user.log', '/var/log/lpr.log', '/var/log/cron.log', '/var/log/rsyslog.log',
-                  '/var/log/debug', '/var/log/messages' ],
+    path       => [ '/var/log/mail.info', '/var/log/mail.err', '/var/log/mail.warn', '/var/log/mail.log',
+                    '/var/log/daemon.log', '/var/log/kern.log', '/var/log/auth.log',
+                    '/var/log/user.log', '/var/log/lpr.log', '/var/log/cron.log', '/var/log/rsyslog.log',
+                    '/var/log/debug', '/var/log/messages' ],
     options    => [ 'rotate 4', $logrotation, 'missingok', 'notifempty', 'delaycompress', 'compress', 'sharedscripts' ],
     postrotate => 'reload rsyslog >/dev/null 2>&1 || true'
   }
