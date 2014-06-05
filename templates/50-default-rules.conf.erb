@@ -66,9 +66,15 @@ if $fromhost-ip == '127.0.0.1' then {
 <% end -%>
 
 #
-# Emergencies are sent to everybody logged in.
 # Remove invalid facility CGRE messages first.
-# Otherwise these end up on the console as well.
-#
+# Otherwise these end up on the console.
 :msg, contains, "CGRE[" ~
+
+#
+# Remove gmond error messages as they spam the logs.
+:msg, contains, "Can't call the metric handler function for" ~
+
+#
+# Emergencies are sent to everybody logged in.
 *.emerg                         :omusrmsg:*
+
