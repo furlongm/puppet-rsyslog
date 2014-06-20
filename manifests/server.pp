@@ -13,19 +13,17 @@ class rsyslog::server ($raw_log=undef, $enable_tcp=undef, $enable_udp=undef, $en
 
   } else {
 
-  file { '/etc/rsyslog.d/35-raw.conf':
-    ensure => absent,
-    notify => Service['rsyslog'],
+    file { '/etc/rsyslog.d/35-raw.conf':
+      ensure => absent,
+      notify => Service['rsyslog'],
+    }
   }
 
-  }
   file { '/etc/rsyslog.d/25-raw-format.conf':
     source  => 'puppet:///modules/rsyslog/25-raw-format.conf',
     notify  => Service['rsyslog'],
     require => File['/etc/rsyslog.d'],
   }
-
-  $admin_hosts = hiera('firewall::admin_hosts', [])
 
   file { '/etc/rsyslog.d/02-input-modules.conf':
     content => template("rsyslog/02-input-modules.conf.erb"),
