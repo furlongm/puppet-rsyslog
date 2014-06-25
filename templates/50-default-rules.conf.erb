@@ -16,6 +16,16 @@ $template LOCALnewsn,    "/var/log/news/news.notice"
 $template LOCALdebug,    "/var/log/debug"
 $template LOCALmessages, "/var/log/messages"
 
+#
+# Remove invalid facility CGRE messages first.
+# Otherwise these end up on the console.
+:msg, contains, "CGRE[" ~
+
+#
+# Remove gmond error messages as they spam the logs.
+:msg, contains, "Can't call the metric handler function for" ~
+:msg, contains, "Unable to find the metric information for" ~
+
 <% if $rsyslog_majversion != '5' -%>
 #
 # Only log if the message comes from localhost (requires v7)
@@ -64,16 +74,6 @@ if $fromhost-ip == '127.0.0.1' then {
 <% if $rsyslog_majversion != '5' -%>
 }
 <% end -%>
-
-#
-# Remove invalid facility CGRE messages first.
-# Otherwise these end up on the console.
-:msg, contains, "CGRE[" ~
-
-#
-# Remove gmond error messages as they spam the logs.
-:msg, contains, "Can't call the metric handler function for" ~
-:msg, contains, "Unable to find the metric information for" ~
 
 #
 # Emergencies are sent to everybody logged in.
