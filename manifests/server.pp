@@ -1,4 +1,4 @@
-class rsyslog::server ($raw_log=undef, $enable_tcp=undef, $enable_udp=undef, $enable_relp=true) {
+class rsyslog::server ($raw_log=undef, $enable_tcp=undef, $enable_udp=undef, $enable_relp=true, $manage_firewall=true) {
 
   include rsyslog
   include logrotate
@@ -57,15 +57,21 @@ class rsyslog::server ($raw_log=undef, $enable_tcp=undef, $enable_udp=undef, $en
     options => [ 'rotate 52', 'weekly', 'missingok', 'notifempty', 'delaycompress', 'compress' ],
   }
 
-  $infra_hosts = hiera('firewall::infra_hosts', [])
+  if $manage_firewall {
+    $infra_hosts = hiera('firewall::infra_hosts', [])
+  }
 
   if $enable_tcp {
 
-    firewall::multisource {[ prefix($infra_hosts, '100 rsyslog-tcp,') ]:
-      action => 'accept',
-      proto  => 'tcp',
-      dport  => 514,
+    if $manage_firewall {
+
+      firewall::multisource {[ prefix($infra_hosts, '100 rsyslog-tcp,') ]:
+        action => 'accept',
+        proto  => 'tcp',
+        dport  => 514,
+      }
     }
+
     nagios::service { 'rsyslog_tcp':
       check_command => "check_tcp!514";
     }
@@ -73,17 +79,22 @@ class rsyslog::server ($raw_log=undef, $enable_tcp=undef, $enable_udp=undef, $en
 
   if $enable_udp {
 
-    firewall::multisource {[ prefix($infra_hosts, '101 rsyslog-udp,') ]:
-      action => 'accept',
-      proto  => 'udp',
-      dport  => 514,
+    if $manage_firewall {
+
+      firewall::multisource {[ prefix($infra_hosts, '101 rsyslog-udp,') ]:
+        action => 'accept',
+        proto  => 'udp',
+        dport  => 514,
+      }
     }
+
     file { '/usr/local/lib/nagios/plugins/check_udp_port':
       owner  => root,
       group  => root,
       mode   => '0755',
       source => 'puppet:///modules/rsyslog/check_udp_port',
     }
+
     nagios::nrpe::service { 'rsyslog_udp':
       check_command => '/usr/local/lib/nagios/plugins/check_udp_port 514';
     }
@@ -91,11 +102,15 @@ class rsyslog::server ($raw_log=undef, $enable_tcp=undef, $enable_udp=undef, $en
 
   if $enable_relp {
 
-    firewall::multisource {[ prefix($infra_hosts, '101 rsyslog-relp,') ]:
-      action => 'accept',
-      proto  => 'tcp',
-      dport  => 20514,
+    if $manage_firewall {
+
+      firewall::multisource {[ prefix($infra_hosts, '101 rsyslog-relp,') ]:
+        action => 'accept',
+        proto  => 'tcp',
+        dport  => 20514,
+      }
     }
+
     nagios::service { 'rsyslog_relp':
       check_command => "check_tcp!20514";
     }
