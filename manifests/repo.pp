@@ -1,6 +1,9 @@
-class rsyslog::repo {
+# Sets up repo for adiscon rsyslog
+class rsyslog::repo(
+  $major_version=7
+) {
 
-  apt::ppa { 'ppa:adiscon/v7-stable':
+  apt::ppa { "ppa:adiscon/v${major_version}-stable":
     release => "${::lsbdistcodename}",
   }
 
@@ -17,7 +20,7 @@ class rsyslog::repo {
   }
 
   apt::key { 'adiscon':
-    key         => 'AEF0CF8E',
+    key         => '1362E120FE08D280780169DC894ECF17AEF0CF8E',
     key_options => $key_options,
   }
 }
